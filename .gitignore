@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Logs / Temp
+*.log
+*.tmp
+
+# wafw00f has its own .git — exclude embedded repo, include source files
+wafw00f/.git/
+wafw00f/*.egg-info/
+wafw00f/build/
+wafw00f/dist/
+wafw00f/__pycache__/
+
+# Generator scripts
+_write_ransomware.py
+

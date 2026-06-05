@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛡️ Security Testing Suite v3 — WAF + DDoS + Phishing + Ransomware Lab</title>
+  <meta name="description" content="Kiem thu bao mat toan dien: WAF, DDoS, Phishing, Ransomware cho moi truong local.">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app-wrapper">
+
+  <!-- ─── Header ─────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-logo">
+      <div class="logo-icon">🛡️</div>
+      <div>
+        <div class="logo-text">Security <span>Testing Suite</span> <span class="version-badge">v3.0</span></div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:1px">WAF · DDoS · Phishing · Ransomware Lab</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-pill" id="api-status">
+        <span class="status-dot"></span>
+        <span id="api-status-text">Connecting...</span>
+      </div>
+      <div class="status-pill" id="target-status">
+        <span class="status-dot"></span>
+        <span id="target-status-text">Target Unknown</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Tab Navigation ─────────────────────────────────── -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('ddos')" id="tab-ddos">💥 DDoS Simulation</button>
+    <button class="tab-btn" onclick="switchTab('phishing')" id="tab-phishing">🎣 Phishing Test</button>
+    <button class="tab-btn" onclick="switchTab('ransomware')" id="tab-ransomware">🔐 Ransomware Test</button>
+    <button class="tab-btn" onclick="switchTab('waf')" id="tab-waf">🔍 WAF Scanner</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- ── Stats Row ─────────────────────────────────────── -->
+    <div class="stats-row">
+      <div class="stat-card blue">
+        <div class="stat-value" id="s-total-sent">0</div>
+        <div class="stat-label">Requests Sent</div>
+        <div class="stat-sub" id="s-total-ok">— OK</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-value" id="s-rps">0</div>
+        <div class="stat-label">Req / Second</div>
+        <div class="stat-sub" id="s-attack-type">Idle</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-value" id="s-security-score">—</div>
+        <div class="stat-label">Security Score</div>
+        <div class="stat-sub" id="s-security-grade">Not tested</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-value" id="s-latency">—</div>
+        <div class="stat-label">Target Latency</div>
+        <div class="stat-sub" id="s-target-alive">Checking...</div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB: DDoS Simulation                                  -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-content-ddos" class="tab-content active">
+      <div class="two-col-grid">
+
+        <!-- DDoS Standard Panel -->
+        <div class="card" id="ddos-panel">
+          <div class="card-header">
+            <div class="card-title"><div class="card-icon red">💥</div>DDoS Simulator</div>
+            <span class="badge badge-red" id="ddos-badge">IDLE</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label">Attack Type</label>
+            <div class="attack-type-grid">
+              <label class="attack-type-card active" id="atk-http_flood" onclick="selectAttack('http_flood')">
+                <span class="attack-emoji">🔥</span>
+                <div class="attack-type-name">HTTP Flood</div>
+                <div class="attack-type-desc">GET/POST Flood</div>
+              </label>
+              <label class="attack-type-card" id="atk-post_flood" onclick="selectAttack('post_flood')">
+                <span class="attack-emoji">📦</span>
+                <div class="attack-type-name">POST Flood</div>
+                <div class="attack-type-desc">Large payloads</div>
+              </label>
+              <label class="attack-type-card" id="atk-slowloris" onclick="selectAttack('slowloris')">
+                <span class="attack-emoji">🐌</span>
+                <div class="attack-type-name">Slowloris</div>
+                <div class="attack-type-desc">Connection exhaust</div>
+              </label>
+            </div>
+
+            <div class="form-group" style="margin-top:14px">
+              <label class="form-label" for="ddos-target">Target URL</label>
+              <input type="text" class="form-input" id="ddos-target"
+                placeholder="http://localhost:5000" value="http://localhost:5000">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" id="workers-label">Workers / Sockets</label>
+                <div class="range-group">
+                  <input type="range" class="form-range" id="ddos-workers" min="1" max="500" value="100"
+                    oninput="document.getElementById('ddos-workers-val').textContent=this.value">
+                  <span class="range-value" id="ddos-workers-val">100</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duration (s)</label>
+                <div class="range-group">
+                  <input type="range" class="form-range" id="ddos-duration" min="5" max="300" value="30"
+                    oninput="document.getElementById('ddos-duration-val').textContent=this.value">
+                  <span class="range-value" id="ddos-duration-val">30</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="attack-progress-wrap" id="attack-progress-wrap" style="display:none">
+              <div class="attack-progress-bar" id="attack-progress-bar"></div>
+            </div>
+
+            <div class="ddos-status-bar">
+              <div class="ddos-metric"><span class="ddos-metric-val" id="d-sent">0</span><div class="ddos-metric-name">Sent</div></div>
+              <div class="ddos-metric"><span class="ddos-metric-val" id="d-rps" style="color:var(--accent-red)">0</span><div class="ddos-metric-name">RPS</div></div>
+              <div class="ddos-metric"><span class="ddos-metric-val" id="d-elapsed" style="color:var(--accent-purple)">0s</span><div class="ddos-metric-name">Elapsed</div></div>
+            </div>
+            <div class="divider"></div>
+            <div class="btn-group">
+              <button class="btn btn-danger btn-full btn-lg" id="btn-ddos-start" onclick="startDDoS()">⚡ Launch Attack</button>
+              <button class="btn btn-outline btn-lg" id="btn-ddos-stop" onclick="stopDDoS()" disabled>⏹ Stop</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enhanced DDoS Panel -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><div class="card-icon red">🚀</div>Enhanced DDoS</div>
+            <span class="badge badge-red" id="enhanced-badge">IDLE</span>
+          </div>
+          <div class="card-body">
+            <label class="form-label">Advanced Attack Type</label>
+            <div class="enhanced-type-list" id="enhanced-type-list">
+              <label class="enhanced-card active" id="enh-ua_flood" onclick="selectEnhanced('ua_flood')">
+                <span>🎭</span><div><b>UA Rotation Flood</b><p>Rotates User-Agents & spoofs IPs to evade WAF rate limits</p></div>
+              </label>
+              <label class="enhanced-card" id="enh-xml_bomb" onclick="selectEnhanced('xml_bomb')">
+                <span>💣</span><div><b>XML Bomb</b><p>Exponential entity expansion to crash XML parsers</p></div>
+              </label>
+              <label class="enhanced-card" id="enh-large_payload" onclick="selectEnhanced('large_payload')">
+                <span>📦</span><div><b>Large Payload (512KB)</b><p>Exhaust server memory & bandwidth with massive POST bodies</p></div>
+              </label>
+              <label class="enhanced-card" id="enh-header_overflow" onclick="selectEnhanced('header_overflow')">
+                <span>📨</span><div><b>Header Overflow</b><p>8KB headers + 50 cookies to overflow buffers</p></div>
+              </label>
+              <label class="enhanced-card" id="enh-cache_bypass" onclick="selectEnhanced('cache_bypass')">
+                <span>🔄</span><div><b>Cache Bypass</b><p>Random params to bypass CDN cache, hit origin every time</p></div>
+              </label>
+            </div>
+
+            <div class="form-group" style="margin-top:10px">
+              <label class="form-label" for="enhanced-target">Target URL</label>
+              <input type="text" class="form-input" id="enhanced-target"
+                placeholder="http://localhost:5000" value="http://localhost:5000">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Workers</label>
+                <div class="range-group">
+                  <input type="range" class="form-range" id="enhanced-workers" min="1" max="300" value="80"
+                    oninput="document.getElementById('enhanced-workers-val').textContent=this.value">
+                  <span class="range-value" id="enhanced-workers-val">80</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duration (s)</label>
+                <div class="range-group">
+                  <input type="range" class="form-range" id="enhanced-duration" min="5" max="180" value="20"
+                    oninput="document.getElementById('enhanced-duration-val').textContent=this.value">
+                  <span class="range-value" id="enhanced-duration-val">20</span>
+                </div>
+              </div>
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-danger btn-full" id="btn-enhanced-start" onclick="startEnhanced()">🚀 Launch Enhanced</button>
+              <button class="btn btn-outline" id="btn-enhanced-stop" onclick="stopEnhanced()" disabled>⏹ Stop</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end two-col-grid -->
+
+      <!-- RPS Chart -->
+      <div class="card chart-container">
+        <div class="card-header">
+          <div class="card-title"><div class="card-icon red">📈</div>Real-Time Attack Graph</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:0.75rem;color:var(--text-muted)">RPS over time</span>
+            <button class="btn btn-outline" style="padding:4px 10px;font-size:0.75rem" onclick="clearChart()">Clear</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrapper"><canvas id="rps-chart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Target Monitor -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-icon green">🎯</div>Target Monitor</div>
+          <button class="btn btn-outline" style="padding:4px 10px;font-size:0.75rem" onclick="checkTarget()">Refresh</button>
+        </div>
+        <div class="card-body">
+          <div class="target-alive">
+            <span class="status-dot" id="target-dot" style="background:var(--text-muted)"></span>
+            <span class="target-status-text" id="target-status-detail">Checking target server...</span>
+          </div>
+          <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px">Response Latency</div>
+          <div class="latency-bar-wrapper">
+            <div class="latency-bar" id="latency-bar" style="width:0%"></div>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;text-align:right" id="latency-text">—</div>
+          <div class="divider"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="text-align:center;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:800;color:var(--accent-cyan)" id="srv-total">—</div>
+              <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;margin-top:2px">Total Requests</div>
+            </div>
+            <div style="text-align:center;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:1.2rem;font-weight:800;color:var(--accent-orange)" id="srv-rps">—</div>
+              <div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;margin-top:2px">Req / Sec</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end tab-content-ddos -->
+
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB: Phishing Resistance Test                         -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-content-phishing" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-icon blue">🎣</div>Phishing Resistance Test</div>
+          <span class="badge badge-blue" id="phishing-badge">READY</span>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">
+            Kiem tra kha nang chong Phishing: Security Headers, Clickjacking, Cookie flags,
+            Open Redirect, HTTPS, Sensitive Path Exposure va nhieu kiem tra bao mat khac.
+          </p>
+          <div class="form-row">
+            <div class="form-group" style="flex:2">
+              <label class="form-label" for="phishing-url">Target URL</label>
+              <input type="text" class="form-input" id="phishing-url"
+                placeholder="http://localhost:5000" value="http://localhost:5000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phishing-timeout">Timeout (s)</label>
+              <input type="number" class="form-input" id="phishing-timeout" value="10" min="5" max="30">
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-full btn-lg" id="btn-phishing-run" onclick="runPhishingTest()">
+              🎣 Run Phishing Test
+            </button>
+          </div>
+
+          <!-- Score display -->
+          <div id="phishing-score-box" style="display:none;margin-top:20px">
+            <div class="score-display">
+              <div class="score-circle" id="phishing-score-circle">
+                <div class="score-num" id="phishing-score-num">—</div>
+                <div class="score-label">/ 100</div>
+              </div>
+              <div class="score-info">
+                <div class="score-grade" id="phishing-grade">—</div>
+                <div class="score-desc" id="phishing-desc">—</div>
+                <div class="score-meta" id="phishing-meta"></div>
+              </div>
+            </div>
+            <div class="check-summary" id="phishing-summary"></div>
+          </div>
+
+          <!-- Results list -->
+          <div id="phishing-results" style="margin-top:16px"></div>
+        </div>
+      </div>
+    </div><!-- end phishing tab -->
+
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB: Ransomware Resilience Test                       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-content-ransomware" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-icon red">🔐</div>Ransomware Resilience Test</div>
+          <span class="badge badge-red" id="ransomware-badge">READY</span>
+        </div>
+        <div class="card-body">
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px">
+            Kiem tra cac vector tan cong co the dan den Ransomware: File Upload, Path Traversal,
+            SQL Injection, Command Injection, Default Credentials, Backup Exposure, Unauthenticated API.
+          </p>
+
+          <!-- Risk legend -->
+          <div class="risk-legend">
+            <span class="risk-badge critical">CRITICAL</span>
+            <span class="risk-badge high">HIGH</span>
+            <span class="risk-badge medium">MEDIUM</span>
+            <span class="risk-badge low">LOW</span>
+            <span class="risk-badge safe">SAFE</span>
+          </div>
+
+          <div class="form-row" style="margin-top:14px">
+            <div class="form-group" style="flex:2">
+              <label class="form-label" for="ransomware-url">Target URL</label>
+              <input type="text" class="form-input" id="ransomware-url"
+                placeholder="http://localhost:5000" value="http://localhost:5000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ransomware-timeout">Timeout (s)</label>
+              <input type="number" class="form-input" id="ransomware-timeout" value="8" min="3" max="30">
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-danger btn-full btn-lg" id="btn-ransomware-run" onclick="runRansomwareTest()">
+              🔐 Run Vulnerability Scan
+            </button>
+          </div>
+
+          <!-- Risk display -->
+          <div id="ransomware-risk-box" style="display:none;margin-top:20px">
+            <div class="risk-display">
+              <div class="risk-meter" id="ransomware-risk-meter">
+                <div class="risk-fill" id="ransomware-risk-fill"></div>
+              </div>
+              <div class="risk-info">
+                <div class="risk-level" id="ransomware-risk-level">—</div>
+                <div id="ransomware-counts"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div id="ransomware-results" style="margin-top:16px"></div>
+        </div>
+      </div>
+    </div><!-- end ransomware tab -->
+
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB: WAF Scanner                                      -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-content-waf" class="tab-content">
+      <div class="card" id="waf-panel">
+        <div class="card-header">
+          <div class="card-title"><div class="card-icon blue">🔍</div>WAF Scanner</div>
+          <span class="badge badge-blue" id="waf-badge">READY</span>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label" for="waf-url">Target URL</label>
+            <input type="text" class="form-input" id="waf-url"
+              placeholder="http://localhost:5000" value="http://localhost:5000">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="waf-timeout">Timeout (s)</label>
+              <input type="number" class="form-input" id="waf-timeout" value="10" min="3" max="60">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Options</label>
+              <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer">
+                <input type="checkbox" id="waf-findall" style="accent-color:var(--accent-blue)">
+                <span style="font-size:0.85rem;color:var(--text-secondary)">Find all WAFs</span>
+              </label>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-primary btn-full btn-lg" id="btn-waf-scan" onclick="startWAFScan()">
+              🔍 Start WAF Scan
+            </button>
+            <button class="btn btn-outline" onclick="clearWAFResult()">✕</button>
+          </div>
+
+          <div id="waf-result-box">
+            <div id="waf-result-content"></div>
+            <div class="raw-output" id="waf-raw-output"></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- end waf tab -->
+
+
+    <!-- ── Live Log ─────────────────────────────────────────── -->
+    <div class="card" id="live-log">
+      <div class="card-header">
+        <div class="card-title"><div class="card-icon purple">📟</div>Live Event Log</div>
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:0.75rem" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="card-body" style="padding:16px 20px">
+        <div class="log-terminal" id="log-terminal">
+          <div class="log-entry">
+            <span class="log-time">--:--:--</span>
+            <span class="log-level info">INFO</span>
+            <span class="log-msg">Dang ket noi den API server...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
