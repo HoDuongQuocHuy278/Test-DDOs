@@ -108,23 +108,23 @@
             <div class="form-group" style="margin-top:14px">
               <label class="form-label" for="ddos-target">Target URL</label>
               <input type="text" class="form-input" id="ddos-target"
-                placeholder="http://localhost:5000" value="http://localhost:5000">
+                placeholder="http://localhost:5100" value="http://localhost:5100">
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" id="workers-label">Workers / Sockets</label>
                 <div class="range-group">
-                  <input type="range" class="form-range" id="ddos-workers" min="1" max="500" value="100"
+                  <input type="range" class="form-range" id="ddos-workers" min="1" max="2000" value="500"
                     oninput="document.getElementById('ddos-workers-val').textContent=this.value">
-                  <span class="range-value" id="ddos-workers-val">100</span>
+                  <span class="range-value" id="ddos-workers-val">500</span>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Duration (s)</label>
                 <div class="range-group">
-                  <input type="range" class="form-range" id="ddos-duration" min="5" max="300" value="30"
+                  <input type="range" class="form-range" id="ddos-duration" min="5" max="600" value="60"
                     oninput="document.getElementById('ddos-duration-val').textContent=this.value">
-                  <span class="range-value" id="ddos-duration-val">30</span>
+                  <span class="range-value" id="ddos-duration-val">60</span>
                 </div>
               </div>
             </div>
@@ -175,23 +175,23 @@
             <div class="form-group" style="margin-top:10px">
               <label class="form-label" for="enhanced-target">Target URL</label>
               <input type="text" class="form-input" id="enhanced-target"
-                placeholder="http://localhost:5000" value="http://localhost:5000">
+                placeholder="http://localhost:5100" value="http://localhost:5100">
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label">Workers</label>
                 <div class="range-group">
-                  <input type="range" class="form-range" id="enhanced-workers" min="1" max="300" value="80"
+                  <input type="range" class="form-range" id="enhanced-workers" min="1" max="2000" value="500"
                     oninput="document.getElementById('enhanced-workers-val').textContent=this.value">
-                  <span class="range-value" id="enhanced-workers-val">80</span>
+                  <span class="range-value" id="enhanced-workers-val">500</span>
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Duration (s)</label>
                 <div class="range-group">
-                  <input type="range" class="form-range" id="enhanced-duration" min="5" max="180" value="20"
+                  <input type="range" class="form-range" id="enhanced-duration" min="5" max="600" value="60"
                     oninput="document.getElementById('enhanced-duration-val').textContent=this.value">
-                  <span class="range-value" id="enhanced-duration-val">20</span>
+                  <span class="range-value" id="enhanced-duration-val">60</span>
                 </div>
               </div>
             </div>
@@ -268,7 +268,7 @@
             <div class="form-group" style="flex:2">
               <label class="form-label" for="phishing-url">Target URL</label>
               <input type="text" class="form-input" id="phishing-url"
-                placeholder="http://localhost:5000" value="http://localhost:5000">
+                placeholder="http://localhost:5100" value="http://localhost:5100">
             </div>
             <div class="form-group">
               <label class="form-label" for="phishing-timeout">Timeout (s)</label>
@@ -332,7 +332,7 @@
             <div class="form-group" style="flex:2">
               <label class="form-label" for="ransomware-url">Target URL</label>
               <input type="text" class="form-input" id="ransomware-url"
-                placeholder="http://localhost:5000" value="http://localhost:5000">
+                placeholder="http://localhost:5100" value="http://localhost:5100">
             </div>
             <div class="form-group">
               <label class="form-label" for="ransomware-timeout">Timeout (s)</label>
@@ -378,7 +378,7 @@
           <div class="form-group">
             <label class="form-label" for="waf-url">Target URL</label>
             <input type="text" class="form-input" id="waf-url"
-              placeholder="http://localhost:5000" value="http://localhost:5000">
+              placeholder="http://localhost:5100" value="http://localhost:5100">
           </div>
           <div class="form-row">
             <div class="form-group">
