@@ -220,13 +220,12 @@ async def _run_enhanced_ddos(
     _reset_stats()
 
     connector = aiohttp.TCPConnector(
-        limit=workers + 200,   # headroom cho 2000+ workers
-        limit_per_host=0,      # không giới hạn per-host
+        limit=workers + 50,
         force_close=False,
         enable_cleanup_closed=True,
         ssl=False,
     )
-    timeout = aiohttp.ClientTimeout(total=15, connect=5)
+    timeout = aiohttp.ClientTimeout(total=8, connect=3)
     stop_event = asyncio.Event()
 
     # Map attack type to worker
