@@ -138,10 +138,7 @@ def main():
         with open(app_js_path, 'r', encoding='utf-8') as f:
             js = f.read()
         import re
-        js = re.sub(r"const API_BASE = 'http://localhost:\d+'", f"const API_BASE = 'http://localhost:{api_port}'", js)
-        js = re.sub(r"const WS_URL = 'ws://localhost:\d+'", f"const WS_URL = 'ws://localhost:{api_port}'", js)
-        js = re.sub(r"localhost:\d+'(?!;).*?'", f"localhost:{target_port}'", js)
-        js = re.sub(r"'http://localhost:\d+'(?=\s*;)", f"'http://localhost:{target_port}'", js)
+        js = re.sub(r"const DEFAULT_TARGET = \(\) => 'http://localhost:\d+';", f"const DEFAULT_TARGET = () => 'http://localhost:{target_port}';", js)
         with open(app_js_path, 'w', encoding='utf-8') as f:
             f.write(js)
         print(f"{C.G}[+] Dashboard JS patched{C.E}")

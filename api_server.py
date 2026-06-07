@@ -125,16 +125,16 @@ class WAFScanRequest(BaseModel):
 class DDoSStartRequest(BaseModel):
     target_url: str
     attack_type: str = 'http_flood'
-    workers: int = 50
-    duration: int = 30
+    workers: int = 500       # default 500, UI max = 2000
+    duration: int = 60       # default 60s, UI max = 600s
     rate_limit: Optional[int] = None
-    num_sockets: int = 150
+    num_sockets: int = 1000  # Slowloris: max sockets
 
 class EnhancedDDoSRequest(BaseModel):
     target_url: str
     attack_type: str = 'ua_flood'   # xml_bomb|large_payload|header_overflow|cache_bypass|ua_flood
-    workers: int = 80
-    duration: int = 30
+    workers: int = 500       # default 500, UI max = 2000
+    duration: int = 60       # default 60s, UI max = 600s
 
 class PhishingTestRequest(BaseModel):
     url: str
